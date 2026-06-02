@@ -1,0 +1,372 @@
+{
+  "info": {
+    "name": "校园社区综合服务与报修工单平台 API",
+    "description": "完整的API测试集合",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "认证接口",
+      "item": [
+        {
+          "name": "用户登录 - 管理员",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "用户登录 - 普通用户",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user1\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "用户注册",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"newuser\",\n  \"password\": \"123456\",\n  \"realName\": \"新用户\",\n  \"phone\": \"13800138000\",\n  \"email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "用户登出",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "工单接口",
+      "item": [
+        {
+          "name": "创建工单",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"教室空调故障\",\n  \"description\": \"第三教学楼301教室空调无法制冷\",\n  \"category\": \"REPAIR\",\n  \"type\": \"空调维修\",\n  \"location\": \"第三教学楼301\",\n  \"urgency\": \"HIGH\",\n  \"contactInfo\": \"13800138001\",\n  \"remark\": \"请尽快处理\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ticket",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ticket"]
+            }
+          }
+        },
+        {
+          "name": "查询工单列表",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/ticket/list?pageNum=1&pageSize=10&status=PENDING",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ticket", "list"],
+              "query": [
+                {"key": "pageNum", "value": "1"},
+                {"key": "pageSize", "value": "10"},
+                {"key": "status", "value": "PENDING"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "获取工单详情",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/ticket/{{ticket_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ticket", "{{ticket_id}}"]
+            }
+          }
+        },
+        {
+          "name": "获取工单日志",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/ticket/{{ticket_id}}/logs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ticket", "{{ticket_id}}", "logs"]
+            }
+          }
+        },
+        {
+          "name": "取消工单",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/ticket/{{ticket_id}}/cancel?remark=不需要维修了",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ticket", "{{ticket_id}}", "cancel"],
+              "query": [{"key": "remark", "value": "不需要维修了"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "管理员接口",
+      "item": [
+        {
+          "name": "派单",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{admin_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ticketId\": {{ticket_id}},\n  \"staffId\": 1,\n  \"remark\": \"请优先处理\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/assign",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "assign"]
+            }
+          }
+        },
+        {
+          "name": "获取待处理工单(Redis Set)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{admin_token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/admin/pending-tickets",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "pending-tickets"]
+            }
+          }
+        },
+        {
+          "name": "获取高优先级工单(Redis ZSet)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{admin_token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/admin/high-priority-tickets?topN=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "high-priority-tickets"],
+              "query": [{"key": "topN", "value": "10"}]
+            }
+          }
+        },
+        {
+          "name": "获取员工列表",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{admin_token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/admin/staff/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "staff", "list"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "维修员接口",
+      "item": [
+        {
+          "name": "接单",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{staff_token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/staff/{{ticket_id}}/accept",
+              "host": ["{{base_url}}"],
+              "path": ["api", "staff", "{{ticket_id}}", "accept"]
+            }
+          }
+        },
+        {
+          "name": "完成工单",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{staff_token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/staff/{{ticket_id}}/complete?remark=已修复",
+              "host": ["{{base_url}}"],
+              "path": ["api", "staff", "{{ticket_id}}", "complete"],
+              "query": [{"key": "remark", "value": "已修复"}]
+            }
+          }
+        },
+        {
+          "name": "获取我的工单",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{staff_token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/staff/my-tickets?pageNum=1&pageSize=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "staff", "my-tickets"],
+              "query": [
+                {"key": "pageNum", "value": "1"},
+                {"key": "pageSize", "value": "10"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "评价接口",
+      "item": [
+        {
+          "name": "创建评价",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ticketId\": {{ticket_id}},\n  \"rating\": 5,\n  \"tags\": \"快速响应,专业认真\",\n  \"content\": \"维修师傅很专业，很快就解决了问题\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/evaluation",
+              "host": ["{{base_url}}"],
+              "path": ["api", "evaluation"]
+            }
+          }
+        },
+        {
+          "name": "获取工单评价",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/evaluation/ticket/{{ticket_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "evaluation", "ticket", "{{ticket_id}}"]
+            }
+          }
+        },
+        {
+          "name": "获取员工评价列表",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/evaluation/staff/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "evaluation", "staff", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "公告接口",
+      "item": [
+        {
+          "name": "获取已发布公告",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/notice/published",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notice", "published"]
+            }
+          }
+        },
+        {
+          "name": "获取公告详情",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/notice/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notice", "1"]
+            }
+          }
+        },
+        {
+          "name": "创建公告(管理员)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{admin_token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"系统维护通知\",\n  \"content\": \"系统将于今晚进行维护\",\n  \"type\": \"NOTICE\",\n  \"priority\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/notice",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notice"]
+            }
+          }
+        },
+        {
+          "name": "发布公告(管理员)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization", "value": "Bearer {{admin_token}}"}],
+            "url": {
+              "raw": "{{base_url}}/api/notice/1/publish",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notice", "1", "publish"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {"key": "base_url", "value": "http://localhost:8080"},
+    {"key": "token", "value": ""},
+    {"key": "admin_token", "value": ""},
+    {"key": "staff_token", "value": ""},
+    {"key": "ticket_id", "value": "1"}
+  ]
+}

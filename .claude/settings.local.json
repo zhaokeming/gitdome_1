@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn -q compile exec:java -pl . -Dexec.mainClass=\"org.example.edufix.util.PasswordGenerator\" -Dexec.classpathScope=compile)",
+      "Bash(python3 -c \"import bcrypt; [print\\(f'{p}: {bcrypt.hashpw\\(p.encode\\(\\), bcrypt.gensalt\\(\\)\\).decode\\(\\)}'\\) for p in ['admin123', 'staff123', 'student123']]\")",
+      "Bash(python -c \"import bcrypt; [print\\(f'{p}: {bcrypt.hashpw\\(p.encode\\(\\), bcrypt.gensalt\\(\\)\\).decode\\(\\)}'\\) for p in ['admin123', 'staff123', 'student123']]\")",
+      "Bash(mvn compile *)",
+      "Bash(npm run *)",
+      "Bash(ssh-keygen *)",
+      "Bash(ssh *)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}
