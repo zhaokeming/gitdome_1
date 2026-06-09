@@ -67,6 +67,15 @@
           />
         </el-form-item>
 
+        <el-form-item prop="phone">
+          <el-input
+            v-model="registerForm.phone"
+            placeholder="请输入电话号码"
+            prefix-icon="Phone"
+            size="large"
+          />
+        </el-form-item>
+
         <el-form-item prop="identifierNo">
           <el-input
             v-model="registerForm.identifierNo"
@@ -133,6 +142,7 @@ const registerForm = reactive({
   password: '',
   confirmPassword: '',
   realName: '',
+  phone: '',
   role: 'STUDENT',
   identifierNo: '',
   specialty: ''
@@ -166,6 +176,10 @@ const rules = {
   ],
   realName: [
     { required: true, message: '请输入真实姓名', trigger: 'blur' }
+  ],
+  phone: [
+    { required: true, message: '请输入电话号码', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
   ],
   identifierNo: [
     { required: true, message: '请输入学号/工号', trigger: 'blur' }

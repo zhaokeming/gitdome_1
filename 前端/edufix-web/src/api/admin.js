@@ -34,6 +34,15 @@ export function getStaffList() {
   })
 }
 
+// 撤销派单
+export function revokeAssignment(ticketId) {
+  return request({
+    url: '/admin/revoke-assignment',
+    method: 'post',
+    data: { ticketId }
+  })
+}
+
 // 获取员工详情
 export function getStaffById(id) {
   return request({

@@ -25,3 +25,20 @@ export function logout() {
     method: 'post'
   })
 }
+
+// 获取个人信息
+export function getProfile() {
+  return request({
+    url: '/auth/profile',
+    method: 'get'
+  })
+}
+
+// 更新个人信息
+export function updateProfile(data) {
+  return request({
+    url: '/auth/profile',
+    method: 'put',
+    data
+  })
+}

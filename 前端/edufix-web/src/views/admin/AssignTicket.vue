@@ -67,6 +67,17 @@
       </el-descriptions>
 
       <el-form :model="assignForm" label-width="80px">
+        <el-form-item label="维修专职">
+          <el-select v-model="filterSpecialty" placeholder="全部专职" clearable style="width: 100%" @change="onSpecialtyChange">
+            <el-option label="全部" value="" />
+            <el-option
+              v-for="sp in specialtyOptions"
+              :key="sp"
+              :label="sp"
+              :value="sp"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="维修员" required>
           <el-select v-model="assignForm.staffId" placeholder="请选择维修员" style="width: 100%">
             <el-option
@@ -123,6 +134,7 @@ const pendingTickets = ref([])
 const staffList = ref([])
 const dialogVisible = ref(false)
 const currentTicket = ref(null)
+const filterSpecialty = ref('')
 
 const assignForm = ref({
   staffId: null,
@@ -130,7 +142,25 @@ const assignForm = ref({
 })
 
 const availableStaffList = computed(() => {
-  return staffList.value.filter(s => s.status !== 0)
+  return staffList.value.filter(s => {
+    if (s.status === 0) return false
+    if (filterSpecialty.value && s.specialty !== filterSpecialty.value) return false
+    return true
+  })
+})
+
+const onSpecialtyChange = () => {
+  // 切换专职时清空已选维修员
+  assignForm.value.staffId = null
+}
+
+// 获取所有不重复的专职列表
+const specialtyOptions = computed(() => {
+  const specialties = new Set()
+  staffList.value.forEach(s => {
+    if (s.specialty) specialties.add(s.specialty)
+  })
+  return Array.from(specialties)
 })
 
 const loadPendingTickets = async () => {

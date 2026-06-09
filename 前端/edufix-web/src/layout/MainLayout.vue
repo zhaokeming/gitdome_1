@@ -242,7 +242,7 @@ const handleCommand = async (command) => {
       // 用户取消
     }
   } else if (command === 'profile') {
-    // TODO: 跳转到个人信息页面
+    router.push('/profile')
   }
 }
 

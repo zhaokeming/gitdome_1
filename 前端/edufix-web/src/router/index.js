@@ -45,6 +45,12 @@ const routes = [
         meta: { title: '工单详情', requiresAuth: true }
       },
       {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('@/views/Profile.vue'),
+        meta: { title: '个人信息', requiresAuth: true }
+      },
+      {
         path: 'notices',
         name: 'NoticeList',
         component: () => import('@/views/notice/NoticeList.vue'),

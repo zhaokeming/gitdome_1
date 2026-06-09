@@ -112,6 +112,16 @@
               派单
             </el-button>
             <el-button
+              v-if="row.status === 'ASSIGNED' && row.category === 'REPAIR'"
+              link
+              type="warning"
+              size="small"
+              @click="handleRevoke(row.id)"
+            >
+              <el-icon><RefreshLeft /></el-icon>
+              撤销派单
+            </el-button>
+            <el-button
               v-if="row.status === 'PENDING'"
               link
               type="danger"
@@ -154,9 +164,10 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getTicketList, cancelTicket, deleteTicket } from '@/api/ticket'
+import { revokeAssignment } from '@/api/admin'
 import { getUrgencyText, getUrgencyType, getStatusText, getStatusType, formatTime, CATEGORY_MAP } from '@/utils/constants'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Refresh, View, Operation } from '@element-plus/icons-vue'
+import { Search, Refresh, View, Operation, RefreshLeft } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -277,6 +288,28 @@ const viewDetail = (id) => {
 
 const goAssign = (id) => {
   router.push({ path: '/admin/assign', query: { ticketId: id } })
+}
+
+const handleRevoke = async (id) => {
+  try {
+    await ElMessageBox.confirm(
+      '确定要撤销该工单的派单吗？撤销后工单将回到待派单状态，可重新分配维修员。',
+      '撤销派单确认',
+      {
+        confirmButtonText: '确定撤销',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+
+    await revokeAssignment(id)
+    ElMessage.success('派单已撤销，工单回到待派单状态')
+    loadTickets()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('撤销派单失败:', error)
+    }
+  }
 }
 
 const handleCancel = async (id) => {

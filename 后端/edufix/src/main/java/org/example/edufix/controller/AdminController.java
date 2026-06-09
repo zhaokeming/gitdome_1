@@ -95,6 +95,24 @@ public class AdminController {
     }
 
     /**
+     * 撤销派单（将已派单未接单的工单退回待派单状态）
+     */
+    @PostMapping("/revoke-assignment")
+    public Result<Void> revokeAssignment(@RequestBody java.util.Map<String, Object> request,
+                                         HttpServletRequest httpRequest) {
+        Long operatorId = (Long) httpRequest.getAttribute("userId");
+        String role = (String) httpRequest.getAttribute("role");
+
+        if (!"ADMIN".equals(role)) {
+            throw new BusinessException(403, "无权操作");
+        }
+
+        Long ticketId = Long.valueOf(request.get("ticketId").toString());
+        ticketService.revokeAssignment(ticketId, operatorId);
+        return Result.success("撤销派单成功", null);
+    }
+
+    /**
      * 获取员工列表（含用户信息）
      */
     @GetMapping("/staff/list")

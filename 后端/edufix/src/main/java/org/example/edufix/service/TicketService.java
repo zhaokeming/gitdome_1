@@ -150,6 +150,63 @@ public class TicketService {
     }
 
     /**
+     * 撤销派单（管理员将已派单但未接单的工单退回待派单状态）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void revokeAssignment(Long ticketId, Long operatorId) {
+        Ticket ticket = ticketMapper.selectById(ticketId);
+        if (ticket == null) {
+            throw new BusinessException("工单不存在");
+        }
+
+        if (!"ASSIGNED".equals(ticket.getStatus())) {
+            throw new BusinessException("仅已派单但未接单的工单允许撤销派单");
+        }
+
+        Long oldStaffId = ticket.getStaffId();
+        String oldStatus = ticket.getStatus();
+
+        // 重置为待派单状态
+        ticket.setStatus("PENDING");
+        ticket.setStaffId(null);
+        ticketMapper.updateById(ticket);
+
+        // 记录日志
+        addTicketLog(ticketId, operatorId, null, "REVOKE", oldStatus, "PENDING", "撤销派单");
+
+        // 更新Redis Set
+        redisUtil.sRemove("ticket:status:ASSIGNED", ticketId);
+        redisUtil.sAdd("ticket:status:PENDING", ticketId);
+
+        // 重新加入优先级队列
+        double urgencyScore = getUrgencyScore(ticket.getUrgency());
+        long timeScore = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));
+        double priorityScore = urgencyScore * 1000000000L + (Long.MAX_VALUE - timeScore);
+        ticket.setPriorityScore(priorityScore);
+        ticketMapper.updateById(ticket);
+        redisUtil.zAdd("ticket:priority:queue", ticketId, priorityScore);
+
+        // 通知被撤销的维修员
+        if (oldStaffId != null) {
+            Staff staff = staffMapper.selectById(oldStaffId);
+            if (staff != null) {
+                notificationService.createNotification(staff.getUserId(),
+                        "工单派单已撤销",
+                        "工单「" + ticket.getTitle() + "」的派单已被管理员撤销。",
+                        "TICKET", ticketId);
+            }
+            // 更新原维修员状态
+            updateStaffStatus(oldStaffId);
+        }
+
+        // 通知工单提交者
+        notificationService.createNotification(ticket.getUserId(),
+                "工单重新待派单",
+                "您的工单「" + ticket.getTitle() + "」的派单已被撤销，正在等待重新分配。",
+                "TICKET", ticketId);
+    }
+
+    /**
      * 接单
      */
     @Transactional(rollbackFor = Exception.class)

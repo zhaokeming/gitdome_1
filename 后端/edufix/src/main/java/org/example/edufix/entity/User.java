@@ -36,7 +36,12 @@ public class User implements Serializable {
      * 角色: USER-普通用户, STAFF-维修员, ADMIN-管理员
      */
     private String role;
-    
+
+    /**
+     * 专职（维修员专用）: 公物维修/水电维修/网络维修
+     */
+    private String specialty;
+
     private String avatar;
     
     /**

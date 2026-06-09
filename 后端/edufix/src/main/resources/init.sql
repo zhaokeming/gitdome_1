@@ -5,18 +5,19 @@
 -- 使用说明：
 --   1. 连接 MySQL，USE edufix
 --   2. 复制本脚本全部内容，粘贴到查询窗口执行即可
---   3. 脚本会先删表再重建，确保每次运行结果一致
+--   3. 脚本会先删表再重建，确保每次运行结果一致（已考虑原有数据，会清空后重新插入）
 --
 --   测试账号（密码均为对应的英文+123）：
---   ┌────────────┬───────────┬────────┬──────────────┐
---   │ 用户名     │ 密码      │ 角色   │ 姓名         │
---   ├────────────┼───────────┼────────┼──────────────┤
---   │ admin      │ admin123  │ ADMIN  │ 系统管理员   │
---   │ staff1     │ staff123  │ STAFF  │ 维修员张三   │
---   │ staff2     │ staff123  │ STAFF  │ 维修员李四   │
---   │ staff3     │ staff123  │ STAFF  │ 维修员王五   │
---   │ student1   │ student123│ STUDENT│ 测试学生     │
---   └────────────┴───────────┴────────┴──────────────┘
+--   ┌────────────┬───────────┬────────┬──────────────┬─────────────┬──────────────┐
+--   │ 用户名     │ 密码      │ 角色   │ 姓名         │ 电话号码    │ 专职         │
+--   ├────────────┼───────────┼────────┼──────────────┼─────────────┼──────────────┤
+--   │ admin      │ admin123  │ ADMIN  │ 系统管理员   │ 13800000001 │ -            │
+--   │ staff1     │ staff123  │ STAFF  │ 张三         │ 13811111111 │ 水电维修     │
+--   │ staff2     │ staff123  │ STAFF  │ 李四         │ 13822222222 │ 公物维修     │
+--   │ staff3     │ staff123  │ STAFF  │ 王五         │ 13833333333 │ 网络维修     │
+--   │ student1   │ student123│ STUDENT│ 赵六         │ 13900000001 │ -            │
+--   │ student2   │ student123│ STUDENT│ 钱七         │ 13900000002 │ -            │
+--   └────────────┴───────────┴────────┴──────────────┴─────────────┴──────────────┘
 -- ============================================================================
 
 -- ============================================================================
@@ -46,6 +47,7 @@ CREATE TABLE `user` (
     `phone`          VARCHAR(20)  DEFAULT NULL COMMENT '手机号',
     `email`          VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
     `role`           VARCHAR(20)  NOT NULL DEFAULT 'STUDENT' COMMENT '角色: STUDENT-学生, ADMIN-管理员, STAFF-维修员',
+    `specialty`      VARCHAR(100) DEFAULT NULL COMMENT '专职（维修员专用）: 公物维修/水电维修/网络维修',
     `avatar`         VARCHAR(255) DEFAULT NULL COMMENT '头像URL',
     `status`         TINYINT      NOT NULL DEFAULT 1 COMMENT '状态: 0-禁用, 1-启用',
     `create_time`    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -206,12 +208,13 @@ CREATE TABLE `notification` (
 -- -------------------------------------------
 -- 用户种子数据（密码已由 BCryptPasswordEncoder 生成）
 -- -------------------------------------------
-INSERT INTO `user` (`username`, `password`, `real_name`, `identifier_no`, `role`, `status`) VALUES
-('admin',    '$2a$10$HmC.ZITjNNYanbZQuG8zhOtcCIwDEXvPuikP6MMbz6P2TcP5sJuEC', '系统管理员', 'A001', 'ADMIN',  1),
-('staff1',   '$2a$10$KUcCaQgUim53G79R4vHP1etNwuN4MP3e3vm2A0pNgdCkQftXVrnqK', '维修员张三', 'S001', 'STAFF',  1),
-('staff2',   '$2a$10$KUcCaQgUim53G79R4vHP1etNwuN4MP3e3vm2A0pNgdCkQftXVrnqK', '维修员李四', 'S002', 'STAFF',  1),
-('staff3',   '$2a$10$KUcCaQgUim53G79R4vHP1etNwuN4MP3e3vm2A0pNgdCkQftXVrnqK', '维修员王五', 'S003', 'STAFF',  1),
-('student1', '$2a$10$PvjikIA7rlXIa.thPGT8wOwyJR.DyGb48H8Y093M/KBF0PuQGFdz2', '测试学生',   '2024001', 'STUDENT', 1);
+INSERT INTO `user` (`username`, `password`, `real_name`, `identifier_no`, `phone`, `role`, `specialty`, `status`) VALUES
+('admin',    '$2a$10$HmC.ZITjNNYanbZQuG8zhOtcCIwDEXvPuikP6MMbz6P2TcP5sJuEC', '系统管理员', 'A001',  '13800000001', 'ADMIN',  NULL,      1),
+('staff1',   '$2a$10$KUcCaQgUim53G79R4vHP1etNwuN4MP3e3vm2A0pNgdCkQftXVrnqK', '张三',       'S001',  '13811111111', 'STAFF',  '水电维修', 1),
+('staff2',   '$2a$10$KUcCaQgUim53G79R4vHP1etNwuN4MP3e3vm2A0pNgdCkQftXVrnqK', '李四',       'S002',  '13822222222', 'STAFF',  '公物维修', 1),
+('staff3',   '$2a$10$KUcCaQgUim53G79R4vHP1etNwuN4MP3e3vm2A0pNgdCkQftXVrnqK', '王五',       'S003',  '13833333333', 'STAFF',  '网络维修', 1),
+('student1', '$2a$10$PvjikIA7rlXIa.thPGT8wOwyJR.DyGb48H8Y093M/KBF0PuQGFdz2', '赵六',       '2024001', '13900000001', 'STUDENT', NULL,      1),
+('student2', '$2a$10$PvjikIA7rlXIa.thPGT8wOwyJR.DyGb48H8Y093M/KBF0PuQGFdz2', '钱七',       '2024002', '13900000002', 'STUDENT', NULL,      1);
 
 -- -------------------------------------------
 -- 员工详情种子数据
@@ -232,26 +235,27 @@ INSERT INTO `notice` (`title`, `content`, `type`, `priority`, `publish_time`, `s
 -- 示例工单数据
 -- -------------------------------------------
 INSERT INTO `ticket` (`ticket_no`, `title`, `description`, `category`, `type`, `location`, `urgency`, `status`, `user_id`, `staff_id`, `contact_info`) VALUES
-('TK20260501001', '教室灯管损坏', '博学楼 301 教室第二排上方灯管不亮，影响学生晚自习，请尽快维修。', 'REPAIR', '照明维修', '博学楼301教室', 'NORMAL', 'PENDING',    3, NULL, '13800000001'),
-('TK20260501002', '宿舍水龙头漏水', '明德公寓 5 号楼 302 室卫生间水龙头持续滴水，请安排维修。', 'REPAIR', '水暖维修', '明德公寓5#302', 'HIGH', 'ASSIGNED', 3, 1, '13800000001'),
-('TK20260501003', '食堂卫生建议', '建议在食堂入口处增设洗手池和免洗消毒液，提升就餐卫生条件。', 'SUGGESTION', '设施建议', '第一食堂', 'LOW', 'PENDING', 3, NULL, '13800000001');
+('TK20260501001', '教室灯管损坏', '博学楼 301 教室第二排上方灯管不亮，影响学生晚自习，请尽快维修。', 'REPAIR', '照明维修', '博学楼301教室', 'NORMAL', 'PENDING',    5, NULL, '13900000001'),
+('TK20260501002', '宿舍水龙头漏水', '明德公寓 5 号楼 302 室卫生间水龙头持续滴水，请安排维修。', 'REPAIR', '水暖维修', '明德公寓5#302', 'HIGH', 'ASSIGNED', 6, 2, '13900000002'),
+('TK20260501003', '校园网络故障', '图书馆三楼阅览区无线网络信号弱，无法正常连接，影响学生查阅资料。', 'REPAIR', '网络维修', '图书馆三楼', 'HIGH', 'PENDING', 5, NULL, '13900000001');
 
 -- -------------------------------------------
 -- 示例工单流转日志
 -- -------------------------------------------
 INSERT INTO `ticket_log` (`ticket_id`, `operator_id`, `operator_name`, `action`, `from_status`, `to_status`, `content`) VALUES
-(1, 3, '测试学生', 'CREATE', NULL, 'PENDING', '提交报修工单'),
-(2, 3, '测试学生', 'CREATE', NULL, 'PENDING', '提交报修工单'),
-(2, 1, '系统管理员', 'ASSIGN', 'PENDING', 'ASSIGNED', '指派给维修员张三'),
-(3, 3, '测试学生', 'CREATE', NULL, 'PENDING', '提交建议');
+(1, 5, '赵六', 'CREATE', NULL, 'PENDING', '提交报修工单'),
+(2, 6, '钱七', 'CREATE', NULL, 'PENDING', '提交报修工单'),
+(2, 1, '系统管理员', 'ASSIGN', 'PENDING', 'ASSIGNED', '指派给维修员李四'),
+(3, 5, '赵六', 'CREATE', NULL, 'PENDING', '提交网络报修工单');
 
 -- -------------------------------------------
 -- 示例消息通知
 -- -------------------------------------------
 INSERT INTO `notification` (`user_id`, `title`, `content`, `type`, `related_id`, `is_read`) VALUES
-(3, '工单提交成功', '您的报修工单 TK20260501001（教室灯管损坏）已提交，请耐心等待处理。', 'TICKET', 1, 0),
-(3, '工单已派单', '您的报修工单 TK20260501002（宿舍水龙头漏水）已指派给维修员张三。', 'TICKET', 2, 0),
-(2, '新工单待处理', '您有一个新的报修工单 TK20260501002（宿舍水龙头漏水）待处理，请及时查看。', 'TICKET', 2, 0);
+(5, '工单提交成功', '您的报修工单 TK20260501001（教室灯管损坏）已提交，请耐心等待处理。', 'TICKET', 1, 0),
+(6, '工单已派单', '您的报修工单 TK20260501002（宿舍水龙头漏水）已指派给维修员李四。', 'TICKET', 2, 0),
+(2, '新工单待处理', '您有一个新的报修工单 TK20260501002（宿舍水龙头漏水）待处理，请及时查看。', 'TICKET', 2, 0),
+(5, '工单提交成功', '您的网络报修工单 TK20260501003（校园网络故障）已提交，请耐心等待处理。', 'TICKET', 3, 0);
 
 -- ============================================================================
 -- 脚本执行完毕

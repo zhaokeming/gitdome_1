@@ -31,6 +31,12 @@ public class RegisterRequest {
     private String identifierNo;
 
     /**
+     * 电话号码
+     */
+    @NotBlank(message = "电话号码不能为空")
+    private String phone;
+
+    /**
      * 维修专长（仅STAFF角色使用）
      */
     private String specialty;
